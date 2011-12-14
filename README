@@ -1,0 +1,72 @@
+UsoCA is a set of private/public key pairs and certificates
+for test TLS servers and clients.
+
+CA chains have designed to have very similier structure of
+Verisign's (and other major Certificate Authority's) one, 
+like this:
+
+  Root CA ---> Server CA ---> Server certificate
+
+Several strengths are available for benchmarking
+included in each directory:
+
+   rsa512     - RSA 512bits Cert & Private Key
+   rsa1024    - RSA 1024bits Cert & Private Key
+   rsa2048    - RSA 2048bits Cert & Private Key
+   rsa4096    - RSA 4096bits Cert & Private Key
+
+Each directory has PEM-formatted keys and certificates:
+
+   rootca_key.pem           - private key of the root CA 
+   rootca_cert_sha256.pem   - Root CA self-signed certificate 
+                              (RSAWithSHA256Encryption)
+   rootca_cert_sha1.pem     - Root CA self-signed certificate
+                              (RSAWithSHA1Encryption)
+   rootca_cert_md5.pem      - Root CA self-signed certificate
+                              (RSAWithMD5Encryption)
+
+   serverca_key.pem         - private key of the server CA
+   serverca_cert_sha256.pem - server CA certificate
+                              (RSAWithSHA256Encryption)
+   serverca_cert_sha1.pem   - server CA certificate
+                              (RSAWithSHA1Encryption)
+   serverca_cert_md5.pem    - server CA certificate
+                              (RSAWithMD5Encryption)
+
+   server_key.pem           - private key of the sample server
+   server_cert_sha256.pem   - sample server certificate
+                              (RSAWithSHA256Encryption)
+   server_cert_sha1.pem     - sample server certificate
+                              (RSAWithSHA1Encryption)
+   server_cert_md5.pem      - sample server certificate
+                              (RSAWithMD5Encryption)
+
+for example, to obtain a certificate on your server by 'certtool' 
+command (included in GnuTLS), 
+
+   1. Choice the strength of the chain and go to the directory.
+
+         cd rsa2048
+
+   2. Copy the example certificate config
+       
+         cp server.cfg yourserver.cfg
+
+   3. Edit it.
+         
+         vim yourserver.cfg
+
+      (don't forget to change 'cn' field to your server's FQDN)
+
+   4. Generate private key
+
+         certtool --generate-privkey --outfile yourserver_key.pem --bits 2048
+
+   5. Sign it and done.
+
+         certtool --generate-certificate --load-privkey yourserver_key.pem \
+                  --outfile yourserver_cert_sha1.pem \
+                  --load-ca-certificate serverca_cert_sha1.pem \
+                  --load-ca-privkey serverca_key.pem \
+                  --template yourserver.cfg  --hash sha1
+
